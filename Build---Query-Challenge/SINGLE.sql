@@ -20,10 +20,13 @@ FOREIGN KEY ( ClientID ) REFERENCES CLIENT
 
 
 --Task 2 create your database
-CREATE DATABASE test
-
-USE test
 */
+--CREATE DATABASE test
+--every time the database been used it will be on master need to navigate to test before continues
+
+GO
+USE test
+
 GO
 IF OBJECT_ID('BOOKING') IS NOT NULL
 	DROP TABLE BOOKING;
@@ -81,6 +84,7 @@ CREATE TABLE BOOKING (
 --SELECT * FROM BOOKING;
 
 -- Task 3 add the test data provided to your database
+GO
 
 INSERT INTO TOUR ( TourName , Description ) VALUES
 ( 'North' , 'Tour of wineries and outlets of the Bedigo and Castlemaine region' ),
@@ -120,12 +124,15 @@ INSERT INTO BOOKING ( ClientID , TourName , EventMonth , EventDay , EventYear , 
 /*
 Task 4 Query 1: Write a query that shows the client first name and surname, the tour name and description, the tour event year, month, day and fee, the booking date and the fee paid for the booking
 
-SELECT CLIENT.GivenName , CLIENT.Surname , TOUR.TourName , TOUR.Description , EVENT.EventDay , EVENT.EventYear , EVENT.EventMonth , EVENT.EventDay , EVENT.Fee , BOOKING.Payment ,  BOOKING.DateBooked
+//inner join on when do the inner need to reference all the frioegn key
+
+
+SELECT CLIENT.GivenName , CLIENT.Surname , TOUR.TourName , TOUR.Description , EVENT.EventDay , EVENT.EventYear , EVENT.EventMonth ,  EVENT.Fee , BOOKING.Payment ,  BOOKING.DateBooked
 FROM TOUR
 INNER JOIN EVENT
 ON TOUR.TourName = EVENT.TourName
 INNER JOIN BOOKING
-ON EVENT.EventYear = BOOKING.EventYear
+ON (EVENT.EventYear = BOOKING.EventYear AND EVENT.EventMonth = BOOKING.EventMonth AND  EVENT.EventDay = BOOKING.EventDay AND EVENT.TourName = BOOKING.TourName)
 INNER JOIN CLIENT
 ON BOOKING.ClientID = CLIENT.ClientID
 ;
@@ -157,25 +164,27 @@ WHERE Payment > ( SELECT AVG( Payment ) FROM BOOKING )
 /*
 --Task 5: Create a View based on Query 1 from Task 4
 
+*/
+--error message for duplicate column means one of the identifier has been double used
+/*
 
 CREATE VIEW task5view AS
-SELECT CLIENT.GivenName , CLIENT.Surname , TOUR.TourName , TOUR.Description , EVENT.EventDay , EVENT.EventYear , EVENT.EventMonth , EVENT.EventDay , EVENT.Fee , BOOKING.Payment ,  BOOKING.DateBooked
+SELECT CLIENT.GivenName , CLIENT.Surname , TOUR.TourName , TOUR.Description , EVENT.EventDay , EVENT.EventYear , EVENT.EventMonth ,  EVENT.Fee , BOOKING.Payment ,  BOOKING.DateBooked
 FROM TOUR
 INNER JOIN EVENT
 ON TOUR.TourName = EVENT.TourName
 INNER JOIN BOOKING
-ON EVENT.EventYear = BOOKING.EventYear
+ON (EVENT.EventYear = BOOKING.EventYear AND EVENT.EventMonth = BOOKING.EventMonth AND  EVENT.EventDay = BOOKING.EventDay AND EVENT.TourName = BOOKING.TourName)
 INNER JOIN CLIENT
 ON BOOKING.ClientID = CLIENT.ClientID
-;
 */
 
 /*
 Task 6: Write queries to prove your responses to task 4 are returning the correct/sensible results.
 
-Query1 : save the query into view then count the number of row from task5view the return values should be same
-SELECT COUNT(*) 
-FROM task5view;
+Query1 : run the query for task5view and compare with all the row in booking table beacuse the FOREIGN KEY
+SELECT * FROM task5view;(13 rows)
+SELECT * FROM BOOKING;(13 rows)
 
 Query2 : instead of count list out all the booking record and compare with the values returned
 

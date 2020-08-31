@@ -1,58 +1,55 @@
--- we have been thorugh @create procedure @passing variable into parameter @if logic loop @mutiple sql statement in procedure @how to group complex opration together into sigle procudure
---this a complex example for stored procedure
-IF OBJECT_ID('ADD_CUSTOMER') IS NOT NULL
-DROP PROCEDURE ADD_CUSTOMER;
-GO
--- drop if exists procedure add_customer （older newer database depend on version）
+-- UPD_CUST_SALESYTD demo not same
 
-CREATE PROCEDURE ADD_CUSTOMER @PCUSTID INT, @PCUSTNAME NVARCHAR(100) AS
-
--- begin try end try begin catch end catch sturcture (error handling)
---try block can have logic
--- !!!expected to do try catch for almost everything after any excepiton need do test according to requirement if the test piece are happy you comment those code out, the entire sql need to be run one piece create go between.
+--SELECT, UPDATE, DELETES AND INSERTS
+-- run quiry effeivtiontly
 BEGIN
-    BEGIN TRY
-    -- thats how you throw a excepton out of range same with csharp
-    -- as soon as the excepiton ocure then catch block will catch them
+    DECLARE @ExampleCustId INT = 1, @ExampleAmount MONEY = 100.00;
+    --IF we select sth not exist it will return null values the queire still run don't going to update any rows
+    -- WE DONT HAVE TO CHECK IF THE CUSTOMER EXISTS FRIST WITH WHERE CLAUSE WILL NARROW DOWN THE CHOICE TO ONE
+    -- WITH UPDATE AND DELETE WE CAN JUST RUN THE QUIRE WITHOUT CHECK break out the data
+    --keep this
+    IF (@ExampleAmount > 999.00 )
+        THROW 50000, 'TEST', 1
 
-        IF @PCUSTID < 1 OR @PCUSTID > 499
-            THROW 50020, 'Customer ID out of range', 1
+    IF EXISTS (SELECT * FROM CUSTOMER WHERE CUSTID = @ExampleCustId)
+    --if exist update this 
+    -- If the examplecustid not exist the quiry will still working without breaking the data we can check it later
+    --but for exampleamount we must check it first
+    --keep this
+        UPDATE customer SET sales_ytd = sales_ytd + @ExampleAmount WHERE CUSTID = @ExampleCustId;
+    --else throw a error
+    ELSE
+        THROW 50001, 'NO CUSTOMER',1
+    --==========above quiry is not suggestable run two quiry waste resouce
+    -- DELETE FROM CUSTOMER WHERE CUSTID = @NONEXISTANT SAME WITH UPDATE
+    --keep this
+    if @@ROWCOUNT = 0
+        THROW 50001, 'NO CUSTOMER', 1
 
-            --if condition within the range pass in the variable into parameter
+        PRINT ('No Row Updated')
+    ELSE
+        PRINT (CONCAT('There was ', @@ROWCOUNT, ' rows ! '))
 
-        INSERT INTO CUSTOMER (CUSTID, CUSTNAME, SALES_YTD, STATUS) 
-        VALUES (@PCUSTID, @PCUSTNAME, 0, 'OK');
+END
 
-    END TRY
-    BEGIN CATCH
-    -- how to find out that error number means by google or just throw it
-        if ERROR_NUMBER() = 2627
-            THROW 50010, 'Duplicate customer ID', 1
-        ELSE IF ERROR_NUMBER() = 50020
-            THROW
-        -- see above the if and else if only have one line of procedure
-        -- here below more than one line you need to have begin and end
-        ELSE
-            BEGIN
-            -- declare a variable but you can not aceess the error message on its own
-            -- save the error message into variable and pass that value into the variable
-                DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
-                THROW 50000, @ERRORMESSAGE, 1
-            END; 
-    END CATCH;
---  we need to write the test with any procedure as assignment required
-END;
+SELECT * FROM CUSTOMER
 
-GO
--- for Guaranteed no row in customer to create a perfect test enviorment
-delete from customer;
--- if the test piece are happy you comment those code out
-GO
--- for this test code the pcustid within the range so it will create varible and pass valuse into the varible sucessfully
-EXEC ADD_CUSTOMER @pcustid = 1, @pcustname = 'testdude2';
--- for this test code due to out of range will the throw 50020 exception
-EXEC ADD_CUSTOMER @pcustid = 500, @pcustname = 'testdude3';
--- for this test code due to dulpulicate the values can not pass in throw 50010 (dulplicate primary key)
-EXEC ADD_CUSTOMER @pcustid = 500, @pcustname = 'testdude4';
--- to see only one row in there
-select * from customer;
+--====================================another demo
+BEGIN
+-- one variable only hold one name but here we select mutiple name into one name
+-- in orical you will have a excepiton for pass into mutiple values into a single variable
+    DECLARE @CNAME VARCHAR(100)
+    --CHECK THE IF THE QURIRY RETURN VALUES ARE QUNIQE
+    IF ((SELECT COUNT(*) FROM CUSTOMER WHERE [STATUS] = 'OK') > 1)
+        THROW 50001, 'NOT A NNIQUE ROW', 1
+    -- if the varible not unique you could miss or lose data WHERE HERE MAKE THE VALUES UNIQUE
+    -- 3 FOR NULL
+    SELECT @CNAME = CUSTNAME FROM CUSTOMER WHERE CUSTID = 1
+    -- DEMO BELOW THE STATTUS WILL HAVE 2 VALUES
+    SELECT @CNAME = CUSTNAME FROM CUSTOMER WHERE [STATUS] = 'OK'
+
+    PRINT @CNAME
+
+END
+
+INSERT INTO CUSTOMER VALUES (2, 'BARNEY RUBBLE', 120.00, 'OK')

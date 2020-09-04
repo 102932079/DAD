@@ -116,7 +116,8 @@ BEGIN
             -- declare a variable but you can not aceess the error message on its own
             -- save the error message into variable and pass that value into the variable
             --excepiton Other
-            --In this syntax, max is the maximum storage size in bytes which is 2^31-1 bytes (2 GB). how to test this?
+            --for error number 50000 untest (how to test this?) In this syntax, max is the maximum storage size in bytes which is 2^31-1 bytes (2 GB). 
+            --datatype of the message
                 DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
                 THROW 50000, @ERRORMESSAGE, 1
             END; 
@@ -137,7 +138,7 @@ EXEC ADD_CUSTOMER @PCUSTID = 0, @PCUSTNAME = 'testdude2';
 --TEST dulplicate EXCEPITON pass
 EXEC ADD_CUSTOMER @PCUSTID = 2, @PCUSTNAME = 'testdude3';
 EXEC ADD_CUSTOMER @PCUSTID = 2, @PCUSTNAME = 'testdude4';
---**********for error number 50000 untest (how to test this?)
+
 --SELECT * FROM customer;
 
 GO
@@ -164,8 +165,10 @@ BEGIN
   END TRY
 
 -- HOW TO USE ERRORMEESSAGE IF WHILE FOR ? 
--- ********** COMPAIR WITH  TASK 1 IS THIS RIGHT WAY  TO CATCH EXCEPITON? DO I NEED BEGIN END HERE FOR MUTI COMMAND LINE
--- ********** DO I NEED ; FOR EVERY END?  
+-- COMPAIR WITH  TASK 1 IS THIS RIGHT WAY  TO CATCH EXCEPITON? DO I NEED BEGIN END HERE FOR MUTI COMMAND LINE (predict)
+-- the throw 50000 here is more likely a backup solution for sth you could not predic but the system will know about it(if the situcation the system knows better than you)
+-- the nvarchar max here is not a excepton it just a datatype the max can change it self to define the the correct limit 1,3,5,7,100... whatever to the maxium possiablity
+-- DO I NEED ; FOR EVERY END?  HOW OFTEN WE USE GO(you can try the execute the query if stopped add go that it for ; the system will show)
   BEGIN CATCH
     DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
     THROW 50000, @ERRORMESSAGE, 1  
@@ -208,7 +211,7 @@ BEGIN
       ( @PPRODID, @PPRODNAME, @PPRICE, 0);
   END TRY
 
---**********ASK ABOUT HOW TRY CATCH WORK
+
   BEGIN CATCH
   -- set a error to exception
     IF ERROR_NUMBER() = 2627
@@ -370,7 +373,9 @@ BEGIN
 
   BEGIN TRY
     --pamt outside range:-999.99 to 999.99 50080. Amount out of range
-    --**********Conditional Logic ? WHY THIS STURCTURE
+    --Conditional Logic ? WHY THIS STURCTURE (the understanding of if conditon)
+    --basicly in try block if any issure is been throwed then go stright into catch block and ignor other line of action
+    --that why two if below beacuse it will never happen at same time, one of the condition happens other condition with their code got ignored
     IF @PAMT < -999.00 OR @PAMT > 999.00
       THROW 50080, 'Amount out of range', 1
 
@@ -486,3 +491,128 @@ GO
 
 --Task7 ending point
 --====================================================================================================================================
+--Task8 starting point UPD_PROD_SALESYTD
+DROP PROCEDURE IF EXISTS UPD_PROD_SALESYTD
+GO
+
+CREATE PROCEDURE UPD_PROD_SALESYTD @PPRODID INT, @PAMT MONEY AS
+BEGIN
+  BEGIN TRY
+    --pamt outside range:-999.99 to 999.99
+    IF @PAMT < -999.99 OR @PAMT > 999.99
+      THROW 50110, 'Amount out of range', 1
+
+    UPDATE PRODUCT SET SALES_YTD = SALES_YTD + @PAMT WHERE PRODID = @PPRODID
+    --No rows updated
+    IF @@ROWCOUNT = 0
+      THROW 50100, 'ProductID not found', 1
+  END TRY
+
+  BEGIN CATCH
+    IF ERROR_NUMBER() IN (50110,50100)
+      THROW
+    ELSE
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 50000, @ERRORMESSAGE, 1
+      END;
+  END CATCH;
+END;
+
+GO
+
+--TEST FOR ID NOT FOUND PASS (SOMETIME IT SAYS PROCEDURE NOT FOUND THEN YOU NEED TO RUN THOURGH WHOLE SQL DROP AND CREATE TABLE)
+EXEC UPD_PROD_SALESYTD @PPRODID = 1001, @PAMT = 500;
+
+--TEST FOR NORMAL RUN
+INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
+(1001, 'TESTPRODUCT', 500 , 500)
+
+EXEC UPD_PROD_SALESYTD @PPRODID = 1001, @PAMT = 500;
+
+--TEST FOR AMOUNT OUT OF RANGE
+
+EXEC UPD_PROD_SALESYTD @PPRODID = 1001, @PAMT = 2000;
+
+DELETE FROM PRODUCT;
+
+GO
+
+--TASK8 ENDING POINT
+--==================================================================================================================================================================
+--TASK9 STARTING POINT
+--TASK9 UPD_CUSTOMER_STATUS
+DROP PROCEDURE IF EXISTS UPD_CUSTOMER_STATUS
+GO
+
+CREATE PROCEDURE UPD_CUSTOMER_STATUS @PCUSTID INT, @PSTATUS NVARCHAR AS
+BEGIN
+  BEGIN TRY
+    --Not Equal Operator: != 
+    -- IF @PSTATUS != ('OK' OR 'SUSPEND')
+    IF (@PSTATUS != 'OK' OR @PSTATUS != 'SUSPEND')
+      THROW 50130, 'Invalid Status Value', 1
+    --Change one customer's status value. 
+    UPDATE CUSTOMER SET [STATUS] = @PSTATUS WHERE CUSTID = @PCUSTID;
+
+    IF @@ROWCOUNT = 0
+      THROW 50120, 'CustomerID not found', 1
+
+  END TRY
+
+  BEGIN CATCH
+
+    IF ERROR_NUMBER() IN (50130,50120)
+      THROW
+    
+    ELSE
+
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 50000, @ERRORMESSAGE, 1
+      END; 
+
+  END CATCH;
+
+END;
+
+GO
+
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES
+(1, 'TESTCUSTOMER1', 500, NULL),
+(2, 'TESTCUSTOMER2', 400, NULL),
+(3, 'TESTCUSTOMER3', 600, NULL);
+
+--TEST FOR NORMAL PASS
+EXEC UPD_CUSTOMER_STATUS  @pcustid = 1, @pstatus = 'OK';
+EXEC UPD_CUSTOMER_STATUS  @pcustid = 2, @pstatus = 'SUSEND';
+
+--TEST FOR ID NOT FOUND PASS
+EXEC UPD_CUSTOMER_STATUS  @pcustid = 5, @pstatus = 'OK';
+
+--TEST FOR INVALID STATUS PASS
+EXEC UPD_CUSTOMER_STATUS  @pcustid = 3, @pstatus = 'WHAT';
+
+GO
+
+--TASK9 ENDING POINT
+--=======================================================================================================================================================================================
+--TASK10 STARTING POINT
+--TASK10 ADD_SIMPLE_SALE GOT PROBLEM
+DROP PROCEDURE IF EXISTS ADD_SIMPLE_SALE
+GO
+
+CREATE PROCEDURE ADD_SIMPLE_SALE @PCUSTID INT, @PPRODID INT, @PQTY INT AS
+BEGIN
+
+  BEGIN TRY
+    DECLARE @TOTAL INT, @STATUS NVARCHAR, @PRICE MONEY, @CID INT, @PID INT;
+
+    SELECT @STATUS = [STATUS] FROM CUSTOMER WHERE CUSTID = @PCUSTID;
+
+  END TRY
+
+  BEGIN CATCH
+  END CATCH
+
+END

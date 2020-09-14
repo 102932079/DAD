@@ -70,7 +70,7 @@ CREATE SEQUENCE SALE_SEQ;
 GO
 --================================================TSQL WORK===================================================================================
 --Task 1 starting point
--- Task01.ADD_CUSTOMER
+-- Task01.ADD_CUSTOMER Add a new customerto Customertable.
 -- we have been thorugh @create procedure @passing variable into parameter @if logic loop @mutiple sql statement in procedure @how to group complex opration together into sigle procudure
 --this a complex example for stored procedure
 DROP PROCEDURE IF EXISTS ADD_CUSTOMER;
@@ -145,7 +145,7 @@ GO
 --Task 1 ending point
 --=================================================================================================================================================
 --Task 2 starting point
---Task02.DELETE_ALL_CUSTOMERS
+--Task02.DELETE_ALL_CUSTOMERS Delete all customers from Customer table.
 --delete from where no parameter rowcount stored procedure.
 --another way to drop procedure
 -- IF OBJECT_ID('ADD_PRODUCT') IS NOT NULL
@@ -187,7 +187,7 @@ GO
 --Task2 ending point
 --============================================================================================================
 --Task3 starting point
---Task3 ADD_PRODUCT SAME TO TASK1
+--Task3 ADD_PRODUCT SAME TO TASK1 Add a new productto Producttable.
 DROP PROCEDURE IF EXISTS ADD_PRODUCT
 GO
 --@ OUTPUT
@@ -255,7 +255,7 @@ GO
 --Task3 ending point
 --============================================================================================================
 --Task4 starting point
---Task4 DELETE_ALL_PRODUCTS
+--Task4 DELETE_ALL_PRODUCTS Delete all products from Product table.
 DROP PROCEDURE IF EXISTS DELETE_ALL_PRODUCTS
 GO
 
@@ -284,7 +284,7 @@ GO
 --Task4 ending point
 --===========================================================================================================
 --Task5 starting point
---Task5 GET_CUSTOMER_STRING
+--Task5 GET_CUSTOMER_STRING Get one customers details from customer table
 DROP PROCEDURE IF EXISTS GET_CUSTOMER_STRING 
 -- USE GO TO JOINT THEM AS BATCH
 GO
@@ -364,7 +364,7 @@ GO
 --Task5 ending points
 --=============================================================================================================================================
 --Task6 strating points
---Task6 UPD_CUST_SALESYTD (this have a demo in complex example sql file)
+--Task6 UPD_CUST_SALESYTD (this have a demo in complex example sql file) Update one customer's sales_ytd value in the customer table
 DROP PROCEDURE IF EXISTS UPD_CUST_SALESYTD
 GO
 
@@ -420,7 +420,7 @@ GO
 --Task6 ending point
 --====================================================================================================================================
 --Task7 strating point
---Task7 GET_PROD_STRING OUT Parameter
+--Task7 GET_PROD_STRING OUT Parameter Get one products details from product table
 DROP PROCEDURE IF EXISTS GET_PROD_STRING
 GO
 --CREATE THIS VARIABLE FOR LATER (SELECT FROM WHERE)
@@ -491,7 +491,8 @@ GO
 
 --Task7 ending point
 --====================================================================================================================================
---Task8 starting point UPD_PROD_SALESYTD
+--Task8 starting point 
+--TASK8  UPD_PROD_SALESYTD Update one product's sales_ytd value in the product table
 DROP PROCEDURE IF EXISTS UPD_PROD_SALESYTD
 GO
 
@@ -541,7 +542,7 @@ GO
 --TASK8 ENDING POINT
 --==================================================================================================================================================================
 --TASK9 STARTING POINT
---TASK9 UPD_CUSTOMER_STATUS
+--TASK9 UPD_CUSTOMER_STATUS Update one customer's status value in the customer table
 DROP PROCEDURE IF EXISTS UPD_CUSTOMER_STATUS
 GO
 
@@ -598,7 +599,7 @@ GO
 --TASK9 ENDING POINT
 --=======================================================================================================================================================================================
 --TASK10 STARTING POINT
---TASK10 ADD_SIMPLE_SALE (feels like problem?)
+--TASK10 ADD_SIMPLE_SALE (feels like problem?) Update one customer's status value in the customer table
 DROP PROCEDURE IF EXISTS ADD_SIMPLE_SALE
 GO
 
@@ -610,12 +611,12 @@ BEGIN
     --TOTAL AND PRICE IS FOR CALCULATE (WE GIVE QTY)
     --STATUS CID AND PID IS FOR JUDGE EXCEPITON
 
-    DECLARE @TOTAL INT, @STATUS NVARCHAR, @PRICE MONEY, @CID INT, @PID INT;
+    DECLARE @TOTAL MONEY, @STATUS NVARCHAR, @PRICE MONEY, @CID INT, @PID INT;
 
     SELECT @STATUS = [STATUS] FROM CUSTOMER WHERE CUSTID = @PCUSTID;
     SELECT @PRICE = SELLING_PRICE FROM PRODUCT WHERE PRODID = @PPRODID;
     SELECT @CID = CUSTID FROM CUSTOMER WHERE CUSTID = @PCUSTID;
-    SELECT @PID = PRODID FROM PRODUCE WHERE PRODID = @PPRODID;
+    SELECT @PID = PRODID FROM PRODUCT WHERE PRODID = @PPRODID;
 
     --ANY OF THE IF BELOW HAPPENS GOES TO CATCH BLOCK
     --No matching customer id found
@@ -636,10 +637,11 @@ BEGIN
     --RUN HERE IF NONE OF ABOVE CONDITON HAPPENS
     --Update both the Customer and Product SalesYTD values 
     --Calls UPD_CUST_SALES_YTD_IN_DB  and UPD_PROD_SALES_YTD_IN_DB
+    
     EXEC UPD_CUST_SALESYTD @PCUSTID = @PCUSTID, @PAMT = @TOTAL;
     EXEC UPD_PROD_SALESYTD @PPRODID = @PPRODID, @PAMT = @TOTAL;
 
-    -- ***************SHOULD I USE ROW COUNT HERE? HOW MANY ROW AFFECTED HRER?
+    -- SHOULD I USE ROW COUNT HERE? HOW MANY ROW AFFECTED HRER? NO
     -- BOTH ID HERE ALSO COULD BE NULL NEED TO CHECK AGAIN HERE
     IF @PCUSTID IS NULL
       THROW 50160, 'Customer ID not found', 1
@@ -672,10 +674,10 @@ INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
 (1002, 'TESTPRODUCT2', 300, 400),
 (1003, 'TESTPRODUCT3', 500, 600);
 
-INSERT INTO customer(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
 (1, 'TESTCUSTOMER1', 200, 'OK'),
 (2, 'TESTCUSTOMER2', 400, 'OK'),
-(3, 'TESTCUSTOMER3', 600, 'OK');
+(3, 'TESTCUSTOMER3', 600, 'OK'),
 (4, 'TESTCUSTOMER4', 800, 'SUSPEND');
 
 --NORMAL TEST 
@@ -705,7 +707,7 @@ DELETE FROM PRODUCT;
 --==================================================================================================================================
 GO
 --TASK 11 STARTING POINT
---TASK 11 SUM_CUSTOMER_SALESYTD
+--TASK 11 SUM_CUSTOMER_SALESYTD Sum and return the SalesYTD value of all rows in the Customer table
 DROP PROCEDURE IF EXISTS SUM_CUSTOMER_SALESYTD
 GO
 
@@ -731,7 +733,7 @@ GO
 INSERT INTO customer(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
 (1, 'TESTCUSTOMER1', 200, 'OK'),
 (2, 'TESTCUSTOMER2', 400, 'OK'),
-(3, 'TESTCUSTOMER3', 600, 'OK');
+(3, 'TESTCUSTOMER3', 600, 'OK'),
 (4, 'TESTCUSTOMER4', 800, 'SUSPEND');
 
 GO
@@ -748,14 +750,14 @@ GO
 --TASK11 ENDING POINT
 --=============================================================================================================================================
 --TASK12 STARTING POINT
---TASK12 SUM_PRODUCT_SALESYTD
+--TASK12 SUM_PRODUCT_SALESYTD Sum and return the SalesYTD value of all rows in the Product table
 DROP PROCEDURE IF EXISTS SUM_PRODUCT_SALESYTD
 GO
 
 CREATE PROCEDURE SUM_PRODUCT_SALESYTD AS
 BEGIN
   BEGIN TRY
-    RETURN (SELECT SUM(SALES_YTD) FROM PRODUCT))
+    RETURN (SELECT SUM(SALES_YTD) FROM PRODUCT)
   END TRY
 
   BEGIN CATCH
@@ -789,17 +791,17 @@ GO
 --TASK12 ENDING POINT
 --======================================================================================================================================================
 --TASK13 STARING POINT
---TASK13 GET_ALL_CUSTOMERS
+--TASK13 GET_ALL_CUSTOMERS Get all customer details and return as a SYS_REFCURSOR
 --cursor
 
 --like a pointer- doesn't hold data- refers to a place in memory where data is stored
 --when you run a query gernally - create a temprorary table that stroed in memory
 --when the table are not need it released from memory
-
+/* ==============================cursor demo===============
 INSERT INTO customer(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
 (1, 'TESTCUSTOMER1', 200, 'OK'),
 (2, 'TESTCUSTOMER2', 400, 'OK'),
-(3, 'TESTCUSTOMER3', 600, 'OK');
+(3, 'TESTCUSTOMER3', 600, 'OK'),
 (4, 'TESTCUSTOMER4', 800, 'SUSPEND');
 
 SELECT * FROM CUSTOMER;
@@ -824,7 +826,7 @@ BEGIN
 END;
 */
 -- STORE THE CURSOR INTO MEMEORY AND USE CURSOR NAME AS A REFERENCE LEAD THE SYSTEM TO THE LOCATION
-
+/*
 DROP PROCEDURE IF EXISTS CURSORDEMO;
 GO
 --TSQL CURSOR OUTPUT
@@ -871,7 +873,7 @@ BEGIN
   --EMPTY THE MEMORY SAVE IT FOR SYSTEM
   DEALLOCATE @MYCUR;
 END;
-/*
+
 SEE PICUTRE:
 
 APP
@@ -880,3 +882,656 @@ API  SO LOOPING THROUGH THE CURSOR AT API LEVEL
   API CALL STORED PROCEDURE , RETURN WITH CURSOR
 DATABASE
 */
+--====================================cursor demo finish===================================
+
+--back to task13
+
+DROP PROCEDURE IF EXISTS GET_ALL_CUSTOMERS;
+GO
+
+CREATE PROCEDURE GET_ALL_CUSTOMERS @POUTCUR CURSOR VARYING OUTPUT AS
+BEGIN
+  SET @POUTCUR = CURSOR FOR 
+  SELECT *
+  FROM PRODUCT;
+
+  OPEN @POUTCUR;
+END
+
+GO
+BEGIN
+  BEGIN TRY
+    DECLARE @OUTCUST AS CURSOR;
+    DECLARE @OUTCNAME NVARCHAR(100), @OUTYTD MONEY, @OUTSTATUS NVARCHAR(10), @OUTCID INT
+    
+    --**********HOW TO Throw Exception Details HERE 50000.  Use value of error_message()
+    --Get all customer details and assign to pOutCur
+    EXEC GET_ALL_CUSTOMERS @POUTCUR = @OUTCUST OUTPUT
+
+    --TEST FOR WHETHER STH CAN BE RETURNED
+    FETCH NEXT FROM @OUTCUST INTO @OUTCID, @OUTCNAME, @OUTYTD, @OUTSTATUS;
+
+    WHILE @@FETCH_STATUS = 0
+
+    BEGIN
+      --SEE CURSOR DEMO
+      PRINT CONCAT(@OUTCID, @OUTCNAME, @OUTYTD, @OUTSTATUS)
+      FETCH NEXT FROM @OUTCUST INTO @OUTCID, @OUTCNAME, @OUTYTD, @OUTSTATUS;
+    END
+
+    CLOSE @OUTCUST;
+    DEALLOCATE @OUTCUST;
+  END TRY
+
+  BEGIN CATCH
+    BEGIN
+      DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+      THROW 50000, @ERRORMESSAGE, 1
+    END;    
+  END CATCH;
+END;
+
+--TASK13 ENDING POINT
+--=================================================================================================
+--TASK14 STARING POINT
+--TASK14 GET_ALL_PRODUCTS Get all product details and assign to pOutCur
+DROP PROCEDURE IF EXISTS GET_ALL_PRODUCTS;
+GO
+
+CREATE PROCEDURE GET_ALL_PRODUCTS @POUTCUR CURSOR VARYING OUTPUT AS
+BEGIN 
+  SET @POUTCUR = CURSOR FOR 
+  SELECT *
+  FROM PRODUCT;
+
+  OPEN @POUTCUR;
+END
+
+GO
+
+BEGIN
+  BEGIN TRY
+    DECLARE @OUTPROD AS CURSOR;
+    DECLARE @OUTPID INT, @OUTPNAME NVARCHAR(100), @OUTPRICE MONEY, @OUTYTD MONEY;
+    --Get all product details and return as a SYS_REFCURSOR
+    --Get all product details and assign to pOutCur
+    EXEC GET_ALL_PRODUCTS @POUTCUR = @OUTPROD OUTPUT
+
+    FETCH NEXT FROM @OUTPROD INTO @OUTPID, @OUTPNAME, @OUTPRICE, @OUTYTD;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN    
+      PRINT CONCAT(@OUTPID, @OUTPNAME, @OUTPRICE, @OUTYTD)
+      FETCH NEXT FROM @OUTPROD INTO @OUTPID, @OUTPNAME, @OUTPRICE, @OUTYTD;
+    END
+
+    CLOSE @OUTPROD;
+    DEALLOCATE @OUTPROD;
+  END TRY
+
+  BEGIN CATCH
+    BEGIN
+      DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+      THROW 50000, @ERRORMESSAGE, 1
+    END;   
+  END CATCH;
+END;
+
+GO
+
+--TASK14 ENDING POINT
+--====================================================================================================
+--TASK15 STARTING POINT
+--TASK15 ADD_LOCATION Add a new row to the location table
+DROP PROCEDURE IF EXISTS ADD_LOCATION;
+GO
+--Location Code- format ‘locnn’ ‘nn’= int ploccode nvarchar
+CREATE PROCEDURE ADD_LOCATION @PLOCCODE NVARCHAR(20), @PMINQTY INT, @PMAXQTY INT AS
+BEGIN
+  BEGIN TRY    
+    INSERT INTO [LOCATION] (LOCID, MINQTY, MAXQTY) VALUES
+    (@PLOCCODE, @PMINQTY, @PMAXQTY)
+    --Duplicate primary key 50180.  Duplicate location ID
+    --Duplicate location ID  Server: Msg 2627, Level 14, State 1, Line 1 Violation of PRIMARY KEY constraint Constraint Name. 
+    IF ERROR_NUMBER() = 2627
+      THROW 50180, 'Duplicate location ID', 1
+    --2628 – String or binary data would be truncated in table ‘%.*ls’, column ‘%.*ls’. Truncated value: ‘%.*ls’.
+    --CHECK_LOCID_LENGTH check failed 50190. Location Code length invalid
+    IF ERROR_NUMBER() = 2628
+      THROW 50190, 'Location Code length invalid', 1
+    --SQL Server throws the error msg 547 when a statement conflicts with the FOREIGN KEY/REFERENCE constraints. 3 possiable ways
+    --CHECK_MINQTY_RANGE check failed 50200. Minimum Qty out of range
+    --CHECK_MAXQTY_RANGE check failed 50210. Maximum Qty out of range
+    --CHECK_MAXQTY_GREATER_MIXQTY check failed 0220. Minimum Qty larger than                  Maximum Qty
+    IF ERROR_NUMBER() = 547
+      -- serach key word
+      BEGIN
+        IF ERROR_MESSAGE() LIKE '%CHECK_MINQTY_RANGE%'
+          THROW 50200, 'Minimum Qty out of range', 1
+        IF ERROR_MESSAGE() LIKE '%CHECK_MAXQTY_RANGE%'
+          THROW 50210, 'Maximum Qty out of range', 1
+        IF ERROR_MESSAGE() LIKE '%CHECK_MAXQTY_GREATER_MIXQTY%'
+          THROW 50220, 'Minimum Qty larger than Maximum Qty', 1
+      END
+  END TRY
+  
+  BEGIN CATCH
+    IF ERROR_NUMBER() IN (50180, 50190, 50200, 50210, 50220)
+      THROW
+    ELSE
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 50000, @ERRORMESSAGE, 1
+      END;    
+  END CATCH;
+END;
+
+GO
+
+DELETE FROM [LOCATION];
+INSERT INTO [LOCATION] (LOCID, MINQTY, MAXQTY) VALUES
+('LOC12', 123, 456);
+
+GO
+
+--TEST DUPLICATE LOCATION ID (LOC12)
+EXEC ADD_LOCATION @PLOCCODE = 'LOC12', @QMINQTY = 123, @QMAXQTY = 456;
+--TEST FOR LOCID LENGTH (LEN = 5 NN=INT)
+EXEC ADD_LOCATION @PLOCCODE = 'LOC123', @QMINQTY = 123, @QMAXQTY = 456;
+--TEST FOR MIN RANGE 0-999
+EXEC ADD_LOCATION @PLOCCODE = 'LOC13', @QMINQTY = 9998, @QMAXQTY = 9999;
+--TEST FOR MAX RANGE 0-999
+EXEC ADD_LOCATION @PLOCCODE = 'LOC13', @QMINQTY = 9998, @QMAXQTY = 9999;
+--TEST FOR MIN GREATER THAN MAX MAX>=MIN
+EXEC ADD_LOCATION @PLOCCODE = 'LOC13', @QMINQTY = 456, @QMAXQTY = 123;
+
+GO
+SELECT * FROM [LOCATION];
+
+GO
+
+DELETE FROM [LOCATION];
+
+GO
+
+--TASK15 ENDING POINT
+
+--=====================================================================================================
+
+--TASK16 STARTING POINT
+--TASK16 ADD_COMPLEX_SALE Adds a complex sale to the database.
+DROP PROCEDURE IF EXISTS ADD_COMPLEX_SALE;
+GO
+
+CREATE PROCEDURE ADD_COMPLEX_SALE @PCUSTID INT, @PPRODID INT, @PQTY INT, @PDATE NVARCHAR(10) AS
+
+BEGIN
+  BEGIN TRY
+    DECLARE @TOTAL MONEY, @STATUS NVARCHAR(7), @PRICE MONEY, @CID INT, @PID INT, @CONVEREDDATE DATE;
+
+    SELECT @STATUS = [STATUS], @CID = CUSTID FROM CUSTOMER WHERE CUSTID = @PCUSTID;
+    SELECT @PRICE = SELLING_PRICE, @UID = PRODID FROM PRODUCT WHERE PRODID = @PPRODID;
+    --select convert(varchar, getdate(), 112) 	20061230
+    --CONVERT VARCHAR TO DATE
+    --Sale Date format yyyymmdd
+    SELECT @CONVEREDDATE = CONVERT(NVARCHAR, @PDATE, 112);
+    --Check if customer status is 'OK'. If not raise an exception. Invalid customer status (status is not 'OK') 50240. Customer status is not OK
+    IF @STATUS != 'OK'
+      THROW THROW 50240, 'Customer Status is not OK', 1
+    --Check if quantity value is valid. If not raise an exception. (1-999) Sale Quantity range1 - 999 50230. Sale Quantity outside valid range
+    IF @PQTY < 1 OR @PQTY > 999
+      THROW 50230, 'Sale Quantity outside valid range', 1
+    --*******Check if date value is valid. If not raise an exception. 2665 Invalid sale date 50250. Date not valid
+    IF ERROR_NUMBER() = 2665
+      THROW 50250, 'Invalid sale date', 1
+
+    -- The saleid value must be obtained from the SALE_SEQ
+    DECLARE @SID BIGINT
+    SET @SID = NEXT VALUES FOR SALE_SEQ      
+
+    -- Note: The YTD values must be increased by pqty * the unit price
+    SET @TOTAL = @PQTY * @PRICE
+
+    -- Calls UPD_CUST_SALES_YTD_IN_DB  and UPD_PROD_SALES_YTD_IN_DB
+    -- Update both the Customer and Product SalesYTD values 
+    
+    EXEC UPD_CUST_SALESYTD @PCUSTID = @PCUSTID, @PAMT = @TOTAL;
+    EXEC UPD_PROD_SALESYTD @PPRODID = @PPRODID, @PAMT = @TOTAL;
+
+    -- Insert a new row into the Sale table.
+    INSERT INTO SALE (SALEID, CUSTID, PRODID, QTY, PRICE, SALEDATE) VALUES
+    (@SID, @PCUSTID, @PPRODID, @PQTY, @PRICE, @CONVEREDDATE)
+
+    --No matching customer id found 50260. Customer ID not found
+    --IF (SELECT COUNT(*) FROM CUSTOMER WHERE CUSTID = @pcustid) = 0
+    IF @CID = NULL
+      THROW 50260, 'Customer ID not found', 1
+    --No matching product id found 50270. Product ID not found
+    IF @PID = NULL
+      THROW 50270, 'Product ID not found', 1
+  END TRY    
+
+  BEGIN CATCH
+    IF ERROR_NUMBER() IN (50270, 50260, 50250, 50240, 50230)
+      THROW
+    ELSE
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 
+      END; 
+  END CATCH;
+END;
+
+GO
+
+INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
+(1001, 'TESTPRODUCT1', 100, 200),
+(1002, 'TESTPRODUCT2', 300, 400),
+(1003, 'TESTPRODUCT3', 500, 600);
+
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
+(1, 'TESTCUSTOMER1', 200, 'OK'),
+(2, 'TESTCUSTOMER2', 400, 'OK'),
+(3, 'TESTCUSTOMER3', 600, 'OK'),
+(4, 'TESTCUSTOMER4', 800, 'SUSPEND');
+--TEST INSERT
+EXEC ADD_COMPLEX_SALE @PCUSTID = 1, @PPRODID = 1001, @PQTY = 10, @PDATE = 20200202;
+--TEST CID NOT FOUND NULL
+EXEC ADD_COMPLEX_SALE @PCUSTID = 5, @PPRODID = 1001, @PQTY = 10, @PDATE = 20200202;
+--TEST PID NOT FOUND NULL
+EXEC ADD_COMPLEX_SALE @PCUSTID = 1, @PPRODID = 1004, @PQTY = 10, @PDATE = 20200202;
+--TEST INVALID DATE YYYYMMDD
+EXEC ADD_COMPLEX_SALE @PCUSTID = 1, @PPRODID = 1001, @PQTY = 10, @PDATE = 20209999;
+--TEST QTY OUT OF RANGE 1-999
+EXEC ADD_COMPLEX_SALE @PCUSTID = 1, @PPRODID = 1001, @PQTY = 1000, @PDATE = 20200202;
+--TEST STATUS NOT OK
+EXEC ADD_COMPLEX_SALE @PCUSTID = 4, @PPRODID = 1001, @PQTY = 10, @PDATE = 20200202;
+
+GO
+
+SELECT * FROM SALE;
+
+GO 
+
+DELETE FROM SALE;
+
+GO
+
+DELETE FROM PRODUCT;
+
+GO
+
+DELETE FROM CUSTOMER;
+
+GO
+--TASK16 ENDING POINT
+--======================================================================================================--TASK17 STARTING POINT
+--TASK17 GET_ALLSALES Get all customer details and return as a SYS_REFCURSOR
+DROP PROCEDURE IF EXISTS GET_ALLSALES;
+GO
+
+CREATE PROCEDURE GET_ALLSALES @POUTCUR CURSOR VARYING OUTPUT AS
+BEGIN
+  SET @POUTCUR = CURSOR FOR
+  SELECT *
+  FROM SALE;
+
+  OPEN @POUTCUR;
+END
+
+GO
+
+BEGIN
+  BEGIN TRY
+    DECLARE @OUTSALE AS CURSOR;
+    DECLARE @OUTSID BIGINT, @OUTCID INT, @OUTPID INT, @OUTQTY INT, @OUTPRICE MONEY, @OUTDATE DATE;
+    --Get all complex sale details and assign to pOutCur
+    EXEC GET_ALLSALES @POUTCUR = @OUTSALE OUTPUT
+
+    FETCH NEXT FROM @OUTSALE INTO @OUTSID, @OUTCID, @OUTPID, @OUTQTY, @OUTPRICE, @OUTDATE;
+
+    WHILE @@FETCH_STATUS = 0
+    
+    BEGIN
+      PRINT CONCAT(@OUTSID, @OUTCID, @OUTPID, @OUTQTY, @OUTPRICE, @OUTDATE);
+      FETCH NEXT FROM @OUTSALE INTO @OUTSID, @OUTCID, @OUTPID, @OUTQTY, @OUTPRICE, @OUTDATE;
+    END
+
+    CLOSE @OUTSALE;
+    DEALLOCATE @OUTSALE;
+
+  END TRY
+
+  BEGIN CATCH
+    BEGIN
+      DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+      THROW 50000, @ERRORMESSAGE, 1
+    END; 
+  END CATCH;
+END;
+
+GO
+
+--TASK17 ENDING POINT
+--===================================================================================================
+--TASK18 STARING POINT
+--TASK18 COUNT_PRODUCT_SALES Count and return the int of sales with nn days of current date
+DROP PROCEDURE COUNT_PRODUCT_SALES;
+GO
+
+CREATE PROCEDURE COUNT_PRODUCT_SALES @PDAYS INT AS
+BEGIN
+  BEGIN TRY
+    DECLARE @DATEADD DATE
+    --DATEADD (datepart , number , date ) This function adds a specified number value (as a signed integer) to a specified datepart of an input date value, and then returns that modified value.
+    --SYSDATETIME ( )  Returns a datetime2(7) value that contains the date and time of the computer on which the instance of SQL Server is running.
+    --Count sales made within pdays of today's date
+    SET @DATEADD = DATEADD(DD, @PDAYS, SYSDATETIME());
+    --RETURN INT
+
+    RETURN (SELECT COUNT(*)
+    FROM SALE
+    WHERE SALEDATE >= @DATEADD);
+
+    --Count and return the int of sales in the SALES table with nn days of current date
+    --**************
+    DECLARE @COUNTPS INT
+    --COUNT THE SALES WITH PDAYS
+    SET @COUNTPS = COUNT_PRODUCT_SALES (@PDAYS)
+  END TRY
+
+  BEGIN CATCH    
+    BEGIN
+      DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+      THROW 50000, @ERRORMESSAGE, 1
+    END; 
+  END CATCH 
+END
+
+GO
+--Count and return the int of sales in the SALES table with nn days of current date
+
+EXEC COUNT_PRODUCT_SALES @PDAYS = 2;
+INSERT
+DELETE
+GO
+--TASK18 ENDING POINT
+--==================================================================================================
+--TASK19 STARTING POINT
+--TASK19 DELETE_SALE Delete a row from the SALE table
+DROP PROCEDURE DELETE_SALE;
+GO
+
+CREATE PROCEDURE DELETE_SALE AS
+BEGIN
+  BEGIN TRY
+    DECLARE @MINSALE BIGINT, @PID INT, @CID INT, @PRICE MONEY
+    --Determine the smallest saleid value in the SALE table.  (use Select MIN()...)
+    SELECT @MINSALE = MIN(SALEID) FROM SALE;
+    DELETE FROM SALE
+    --MAEK MINSALE UNIQUE Otherwise delete a row from the SALE table with the matching sale id
+    WHERE SALEID = @MINSALE;
+    --If the value is NULL raise a No Sale Rows Found exception.No Sale Rows Found 50280. No Sale Rows Found
+    IF @MINSALE = NULL
+      THROW 50280, 'No Sale Rows Found', 1
+    ELSE
+    DECLARE @TOTAL MONEY, @QTY INT
+    SELECT @PRICE = PRICE, @CID = CUSTID, @QTY = QTY, @PID =PRODID
+    FROM SALE
+    WHERE SALEID = @MINSALE
+    --You must calculate the amount using the PRICE in the SALE table multiplied by the QTY
+    SET @TOTAL = @QTY * @PRICE
+    --Calls UPD_CUST_SALES_YTD_IN_DB  and UPD_PROD_SALES_YTD_IN_DB 
+    --so that the correct amount is subtracted from SALES_YTD.
+    --*****************************************
+    --ANOTHER VARIABLE MAKE @CORRECTTOTAL = -(@TOTAL)?
+    EXEC UPD_CUST_SALESYTD @PCUSTID = @PCUSTID, @PAMT = -@TOTAL;
+    EXEC UPD_PROD_SALESYTD @PPRODID = @PPRODID, @PAMT = -@TOTAL;
+  END TRY
+  
+  BEGIN CATCH       
+    IF ERROR_NUMBER() IN (50280)
+      THROW
+    ELSE
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 50000, @ERRORMESSAGE, 1
+    END; 
+  END CATCH;
+END;
+
+GO 
+
+INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
+(1001, 'TESTPRODUCT1', 10, 500),
+(1002, 'TESTPRODUCT2', 20, 500);
+
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
+(1, 'TESTCUSTOMER1', 500, 'OK'),
+(2, 'TESTCUSTOMER2', 500, 'OK');
+    
+INSERT INTO SALE(SALEID, CUSTID, PRODID, QTY, PRICE, SALEDATE) VALUES
+(100, 1, 1001, 10, 10, 2020-10-10),
+(200, 2, 1002, 20, 20, 2020-10-10);
+
+GO
+
+EXEC DELETE_SALE;
+
+GO
+SELECT * FROM CUSTOMER;
+GO
+SELECT * FROM PRODCUT;
+GO
+SELECT * FROM SALE;
+GO
+
+DELETE FROM CUSTOMER;
+GO
+DELETE FROM PRODCUT;
+GO
+DELETE FROM SALE;
+GO
+--TASK19 ENDING POINT
+--=============================================================================
+--TASK20 STARING POINT
+--TASK20 DELETE_ALL_SALES Delete ALL ROWS from the SALE table
+DROP PROCEDURE DELETE_ALL_SALES;
+GO
+
+CREATE PROCEDURE DELETE_ALL_SALES AS
+BEGIN
+  BEGIN TRY
+    --Delete all rows in the SALE table 
+    DELETE FROM SALE;
+    --Set the Sales_YTD value to zero for all rows in the Customer and Product tables
+    UPDATE CUSTOMER
+    SET SALES_YTD = 0;
+  END TRY
+
+  BEGIN CATCH
+    BEGIN
+      DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+      THROW 50000, @ERRORMESSAGE, 1
+    END; 
+  END CATCH;
+END;
+
+GO
+
+INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
+(1001, 'TESTPRODUCT1', 10, 500),
+(1002, 'TESTPRODUCT2', 20, 500);
+
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
+(1, 'TESTCUSTOMER1', 500, 'OK'),
+(2, 'TESTCUSTOMER2', 500, 'OK');
+    
+INSERT INTO SALE(SALEID, CUSTID, PRODID, QTY, PRICE, SALEDATE) VALUES
+(100, 1, 1001, 10, 10, 2020-10-10),
+(200, 2, 1002, 20, 20, 2020-10-10);
+
+GO
+
+EXEC DELETE_ALL_SALES;
+
+GO
+SELECT * FROM CUSTOMER;
+GO
+SELECT * FROM PRODCUT;
+GO
+SELECT * FROM SALE;
+GO
+
+DELETE FROM CUSTOMER;
+GO
+DELETE FROM PRODCUT;
+GO
+DELETE FROM SALE;
+GO
+
+--TASK20 ENDING POINT
+--==================================================================================
+--TASK21 STARTING POINT
+--TASK21 DELETE_CUSTOMER Delete a row from the Customer table
+DROP PROCEDURE IF EXISTS DELETE_CUSTOMER
+GO
+
+CREATE PROCEDURE DELETE_CUSTOMER @PCUSTID INT AS
+BEGIN 
+  BEGIN TRY
+    --Delete a customer with a matching customer id
+    DELETE FROM CUSTOMER
+    WHERE CUSTID = @PCUSTID 
+    --No matching customer id found 50290. Customer ID not found
+    IF @@ROWCOUNT = 0
+      THROW 50290, 'Customer ID not found', 1
+    -- ComplexSales exist for the customer, replace the default error code with a custom made exception to handle this error & raise the exception below
+    -- SHOULD BE HERE IN TRY OR CATCH NEED TO BE DOWN IN CATCH
+    
+  END TRY
+  BEGIN CATCH
+    IF ERROR_NUMBER() IN (50290, 50300)  
+      THROW
+    IF ERROR_NUMBER() = 547
+      THROW 50300, 'Customer cannot be deleted as sales exist', 1
+    ELSE
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 
+      END; 
+  END CATCH;
+END;
+
+GO
+
+INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
+(1001, 'TESTPRODUCT1', 10, 500),
+(1002, 'TESTPRODUCT2', 20, 500);
+
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
+(1, 'TESTCUSTOMER1', 500, 'OK'),
+(2, 'TESTCUSTOMER2', 500, 'OK');
+    
+INSERT INTO SALE(SALEID, CUSTID, PRODID, QTY, PRICE, SALEDATE) VALUES
+(100, 1, 1001, 10, 10, 2020-10-10),
+(200, 2, 1002, 20, 20, 2020-10-10);
+
+GO
+
+--TEST FOR ID NOT FOUND
+EXEC DELETE_CUSTOMER @PCUSTID = 3;
+--TEST FOR SALES EXISTS CANT DELETE
+EXEC DELETE_CUSTOMER @PCUSTID = 1;
+--TEST FOR NORMAL DELETE
+EXEC DELETE_ALL_SALES;
+EXEC DELETE_CUSTOMER @PCUSTID = 1;
+
+GO
+SELECT * FROM CUSTOMER;
+GO
+SELECT * FROM PRODCUT;
+GO
+SELECT * FROM SALE;
+GO
+
+DELETE FROM CUSTOMER;
+GO
+DELETE FROM PRODCUT;
+GO
+DELETE FROM SALE;
+GO
+  
+--TASK21 ENDING POINT;
+--================================================================================
+--TASK22 STARTING POINT
+--TASK22 DELETE_PRODUCT Delete a row from the Product table
+DROP PROCEDURE DELETE_PRODUCT;
+GO
+
+CREATE PROCEDURE DELETE_PRODUCT @PPRODID INT AS
+BEGIN 
+  BEGIN TRY
+    --Delete a product with a matching Product id
+    DELETE FROM PRODUCT
+    WHERE PRODID = @PPRODID
+    --No matching Product id found 50310. Product ID not found
+    IF @@ROWCOUNT = 0
+      THROW 50310, 'Product ID not found', 1    
+  END TRY
+
+  BEGIN CATCH
+    IF ERROR_NUMBER() IN (50310)
+      THROW
+    --Product has child complexsales rows 0320. Product cannot be deleted as sales exist
+    --f ComplexSales exist for the customer, Oracle?? would normally generate a 'Child Record Found' error (error code -2292). Instead,Create a custom made exception to handle this error & raise the exception below
+    IF ERROR_NUMBER() = 547
+            THROW 50320, 'Product cannot be deleted as sales exist', 1
+    ELSE
+      BEGIN
+        DECLARE @ERRORMESSAGE NVARCHAR(MAX) = ERROR_MESSAGE();
+        THROW 
+      END; 
+  END CATCH;
+END;
+
+GO
+
+INSERT INTO PRODUCT(PRODID, PRODNAME, SELLING_PRICE, SALES_YTD) VALUES
+(1001, 'TESTPRODUCT1', 10, 500),
+(1002, 'TESTPRODUCT2', 20, 500);
+
+INSERT INTO CUSTOMER(CUSTID, CUSTNAME, SALES_YTD, [STATUS]) VALUES 
+(1, 'TESTCUSTOMER1', 500, 'OK'),
+(2, 'TESTCUSTOMER2', 500, 'OK');
+    
+INSERT INTO SALE(SALEID, CUSTID, PRODID, QTY, PRICE, SALEDATE) VALUES
+(100, 1, 1001, 10, 10, 2020-10-10),
+(200, 2, 1002, 20, 20, 2020-10-10);
+
+GO
+
+--TEST FOR ID NOT FOUND
+EXEC DELETE_PRODUCT @PPRODID = 1003;
+--TEST FOR SALES EXISTS CANT DELETE
+EXEC DELETE_PRODUCT @PPRODID = 1001;
+--TEST FOR NORMAL DELETE
+EXEC DELETE_ALL_SALES;
+EXEC DELETE_PRODUCT @PPRODID = 1001;
+
+GO
+SELECT * FROM CUSTOMER;
+GO
+SELECT * FROM PRODCUT;
+GO
+SELECT * FROM SALE;
+GO
+
+DELETE FROM CUSTOMER;
+GO
+DELETE FROM PRODCUT;
+GO
+DELETE FROM SALE;
+GO
+
+

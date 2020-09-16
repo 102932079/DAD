@@ -1,0 +1,18 @@
+﻿** Highlights
+     Tables that will be rebuilt
+       None
+     Clustered indexes that will be dropped
+       None
+     Clustered indexes that will be created
+       None
+     Possible data issues
+       None
+
+** User actions
+     Create
+       [dbo].[Enrollment] (Table)
+       [dbo].[Student] (Table)
+       [dbo].[MAT_ASKED_FOR_THIS] (Foreign Key)
+       [dbo].[CK_Grade] (Check Constraint)
+
+** Supporting actions

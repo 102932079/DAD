@@ -1,0 +1,10 @@
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\bin\Debug\DAD_VS_Demo.dacpac
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\bin\Debug\DAD_VS_Demo.dll
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\bin\Debug\DAD_VS_Demo.pdb
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\DAD_VS_Demo.sqlprojAssemblyReference.cache
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\Model.xml
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\refactor.xml
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\postdeploy.sql
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\predeploy.sql
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\DAD_VS_Demo.dll
+C:\Users\tengw\OneDrive\Desktop\github\DAD\DB_Project_Demo\DAD_VS_Demo_solution\DAD_VS_Demo\obj\Debug\DAD_VS_Demo.pdb

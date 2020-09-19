@@ -93,6 +93,102 @@
 			</Relationship>
 			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="4" />
 		</Element>
+		<Element Type="SqlProcedure" Name="[dbo].[ADD_STUDENT]">
+			<Property Name="BodyScript">
+				<Value><![CDATA[
+	INSERT INTO STUDENT (StudentID, Fname, Surname, NewColumn ) VALUES
+    (@pStuid, @pFname, @pSurname, null);
+    
+RETURN 0]]></Value>
+			</Property>
+			<Property Name="IsAnsiNullsOn" Value="True" />
+			<Relationship Name="BodyDependencies">
+				<Entry>
+					<References Name="[dbo].[Student]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[Student].[StudentID]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[Student].[FName]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[Student].[Surname]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[Student].[NewColumn]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[ADD_STUDENT].[@pStuid]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[ADD_STUDENT].[@pFname]" />
+				</Entry>
+				<Entry>
+					<References Name="[dbo].[ADD_STUDENT].[@pSurname]" />
+				</Entry>
+			</Relationship>
+			<Relationship Name="Parameters">
+				<Entry>
+					<Element Type="SqlSubroutineParameter" Name="[dbo].[ADD_STUDENT].[@pStuid]">
+						<Relationship Name="Type">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[int]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSubroutineParameter" Name="[dbo].[ADD_STUDENT].[@pFname]">
+						<Relationship Name="Type">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="Length" Value="100" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSubroutineParameter" Name="[dbo].[ADD_STUDENT].[@pSurname]">
+						<Relationship Name="Type">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="Length" Value="100" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+			</Relationship>
+			<Relationship Name="Schema">
+				<Entry>
+					<References ExternalSource="BuiltIns" Name="[dbo]" />
+				</Entry>
+			</Relationship>
+			<Annotation Type="SysCommentsObjectAnnotation">
+				<Property Name="Length" Value="233" />
+				<Property Name="StartLine" Value="1" />
+				<Property Name="StartColumn" Value="1" />
+				<Property Name="HeaderContents" Value="CREATE PROCEDURE [dbo].[ADD_STUDENT]&#xD;&#xA;&#x9;@pStuid int,&#xD;&#xA;&#x9;@pFname NVARCHAR(100),&#xD;&#xA;&#x9;@pSurname NVARCHAR(100)&#xD;&#xA;AS" />
+			</Annotation>
+		</Element>
 		<Element Type="SqlCheckConstraint" Name="[dbo].[CK_Grade]">
 			<Property Name="CheckExpressionScript">
 				<Value><![CDATA[Grade in ('N', 'P', 'C')]]></Value>
